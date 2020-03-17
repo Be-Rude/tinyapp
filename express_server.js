@@ -1,4 +1,3 @@
-
 const express = require("express");
 const app =  express();
 const PORT = 8080;
@@ -22,6 +21,11 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -31,13 +35,15 @@ app.post("/urls", (req, res) => {
   let longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   console.log(urlDatabase);
-  res.redirect('/u/' + shortURL);      
+  res.redirect('/urls/' + shortURL);      
 });
 
-app.get("/u/:shortURL", (req, res) => {
+app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
+
+
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
@@ -59,4 +65,3 @@ app.get("/hello", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
