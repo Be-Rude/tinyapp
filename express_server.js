@@ -41,6 +41,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const deletedURL = req.params.shortURL;
   delete urlDatabase[deletedURL];
   res.redirect('/urls/');
+});
+
+app.post("/urls/:shortURL/update", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const newLongURL = req.body.updatedURL; //<--not sure what to put here to get the user input
+  urlDatabase[shortURL] = newLongURL;
+  res.redirect('/urls/');
 })
 
 app.get("/urls/:shortURL", (req, res) => {

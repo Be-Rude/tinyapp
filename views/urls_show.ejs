@@ -13,13 +13,15 @@
         <h5 class="card-title">TinyURL for: <a href="/u/<%= longURL %>"></a><%= longURL %></h5>
         <p class="card-text">Short URL: <a href="<%= shortURL %>"><%= shortURL %></a></p>
         
-          <form>
-          <div class="form-group">
-            <label for="updateURL">If you would like to change URL, please enter it here:</label>
-            <input type="URL" class="form-control" id="updateURL" placeholder="New URL">
-          </div>
+        <div class="form-group">
+            <form method="POST" action="/urls/<%= shortURL %>/update">
+            
+            
+            <label for="updatedURL">If you would like to change URL, please enter it here:</label>
+            <input type="text" class="form-control" name="updatedURL" placeholder="New URL">
+          
           <button type="submit" class="btn btn-primary">Submit</button>
-
+        </div>
         </form>
       </div>
     <div class="card-footer text-muted"></div>
