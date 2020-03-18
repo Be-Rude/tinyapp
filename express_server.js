@@ -30,6 +30,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.post("/login", (req, res) => {
+  const user = req.body.username;
+  res.cookie('username', user);
+  res.redirect('/urls/');
+})
+
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString().toString();
   let longURL = req.body.longURL;
