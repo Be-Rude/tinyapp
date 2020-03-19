@@ -29,8 +29,7 @@
           <td><a href='/u/:shortURL'><%= url %></a></td>
           <td><%= urls[url] %></td>
           <td><a href='/urls/<%= url %>'>Edit</a></td> 
-            <!-- <button type="button" class="btn btn-link">Edit</button></td>
-          <td> -->
+            
             <td>
             <form method="POST" action="/urls/<%= url %>/delete">
               <button style="color: red;" type="submit" class="btn btn-outline-danger" value="Delete">Delete</button>

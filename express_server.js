@@ -30,11 +30,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.post("/login", (req, res) => {
-  const user = req.body.username;
-  res.cookie('username', user);
-  res.redirect('/urls/');
-})
+
 
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString().toString();
@@ -51,10 +47,16 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/urls/:shortURL/update", (req, res) => {
   const shortURL = req.params.shortURL;
-  const newLongURL = req.body.updatedURL; //<--not sure what to put here to get the user input
+  const newLongURL = req.body.updatedURL; 
   urlDatabase[shortURL] = newLongURL;
   res.redirect('/urls/');
-})
+});
+
+// app.post("/login", (req, res) => {
+//   const user = req.body.username;
+//   res.cookie('username', user);
+//   res.redirect('/urls/');
+// })
 
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
