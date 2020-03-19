@@ -25,6 +25,10 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const accounts = {
+
+};
+
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
@@ -34,6 +38,14 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     username: req.cookies["username"] };
   res.render("urls_new", templateVars);
+});
+
+app.get("/register", (req, res) => {
+  // accounts.email = req.body["email"];
+  // console.log(accounts)
+  let accountVars = { email: req.body["email"], password: req.body.password, username: req.cookies["username"] };
+  // console.log(accountVars)
+  res.render("urls_registration", accountVars);
 });
 
 app.post("/urls", (req, res) => {
