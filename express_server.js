@@ -11,7 +11,6 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 
 function generateRandomString(length) {
-    length = 6;
     var randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz0123456789';
     var result = '';
     for ( var i = 0; i < length; i++ ) {
@@ -25,8 +24,8 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const accounts = {
-
+const users = {
+  
 };
 
 app.get("/u/:shortURL", (req, res) => {
@@ -49,9 +48,18 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString().toString();
+  let shortURL = generateRandomString(6).toString();
   let longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
+  res.redirect('/urls/');      
+});
+
+app.post("/register", (req, res) => {
+  let userId = generateRandomString(3).toString();
+  let id = userId;
+  users[userId] = { id: id, email: req.body.email, password: req.body.password };
+  res.cookie('user_id', userId);
+  console.log(users)
   res.redirect('/urls/');      
 });
 
