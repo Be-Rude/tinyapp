@@ -46,6 +46,12 @@ app.get("/register", (req, res) => {
   res.render("urls_registration", templateVars);
 });
 
+app.get("/login", (req, res) => {
+  let templateVars = { users, userId: req.cookies['user_id'],  };
+
+  res.render("urls_login", templateVars);
+});
+
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString(6).toString();
   let longURL = req.body.longURL;
@@ -72,7 +78,7 @@ app.post("/register", (req, res) => {
   console.log(users)
   res.cookie('user_id', userId); 
   res.redirect('/urls/');  
-  
+
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {

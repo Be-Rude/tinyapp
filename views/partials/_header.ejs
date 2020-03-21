@@ -13,12 +13,9 @@
     <div>
       
       <% if (!userId) { %>
-        <form method="POST" action="/login">
-          <label for="username"></label>
-          <input type="text" class="form-control" name="username" placeholder="Username" style="width: 300px; margin: 1em"> 
-        </div>
-        <div>
-          <button type="submit" class="btn btn-outline-dark">Submit</button></form>
+        <td><a style="width: 300px; margin: 1em" href='/register'><u>Register</u></a></td>
+        <td><a style="width: 300px; margin: 1em" href='/login'><u>Login</u></a></td>
+        
       <% } else { %>
         <form method="POST" action="/logout">
         <h4>Logged in as: <%= users[userId].email %>
