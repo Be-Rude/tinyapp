@@ -25,6 +25,11 @@ const urlDatabase = {
 };
 
 const users = {
+  ab: {
+    id: 'abcd',
+    email: 'brad@email.com',
+    password: '123'
+  }
 
   };
 
@@ -60,13 +65,12 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  console.log(users)
+  
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send('I\'m sorry, one of the fields are empty. Please try again.'); 
   } 
   
   Object.keys(users).forEach(function(userId) {
-     console.log(req.body.email, users[userId].email)
     if (req.body.email === users[userId].email) {
      res.status(400).send('That email address has already been registered. Please try again.');
     } 
@@ -95,11 +99,30 @@ app.post("/urls/:shortURL/update", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  let templateVars = { urls: urlDatabase, username: req.cookies["username"] };
-  res.redirect('/urls/');
-});
+  let templateVars = { email: req.body.email, password: req.body.password };
+
+  Object.keys(users).forEach(function(userId) {
+    if (req.body.email === users[userId].email) {
+    res.cookie('user_id', userId); 
+    res.redirect('/urls/');
+    }
+  });
+
+  if (req.body.email === "" || req.body.password === "") {
+    res.status(400).send('I\'m sorry, one of the fields are empty. Please try again.'); 
+  } 
+  
+  Object.keys(users).forEach(function(userId) {
+    if (req.body.email !== users[userId].email) {
+     res.status(403).send('Sorry, there is no account registered with that email address.');
+    } 
+
+    if (req.body.email === users[userId].email && req.body.password !== users[userId].password) {
+      res.status(403).send('Sorry, the password is incorrect.');
+    }
+  });
+  
+})
 
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
