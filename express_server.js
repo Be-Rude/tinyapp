@@ -40,7 +40,12 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let templateVars = { users, userId: req.cookies['user_id'] };
-  console.log(templateVars)
+
+  let loginStatus = req.cookies['user_id'];
+
+  if (!loginStatus) {
+    res.redirect('/login');
+  };
 
   res.render("urls_new", templateVars);
 });
