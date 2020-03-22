@@ -25,7 +25,7 @@ const urlDatabase = {
 };
 
 const users = {
-  ab: {
+  abcd: {
     id: 'abcd',
     email: 'brad@email.com',
     password: '123'
@@ -89,7 +89,6 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  console.log(urlDatabase)
   const deletedURL = req.params.shortURL;
   delete urlDatabase[deletedURL];
   res.redirect('/urls/');
@@ -115,7 +114,7 @@ app.post("/login", (req, res) => {
   });
 
   if (req.body.email === "" || req.body.password === "") {
-    res.status(400).send('I\'m sorry, one of the fields are empty. Please try again.'); 
+    res.status(400).send('I\'m sorry, one or more of the fields are empty. Please try again.'); 
   } 
   
   Object.keys(users).forEach(function(userId) {
@@ -144,7 +143,23 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, users, userId: req.cookies['user_id'] };
+  
+  userId = req.cookies['user_id'];
+  shortURL = Object.keys(urlDatabase)[0];
+  longURL = urlDatabase[shortURL].longURL;
+  let urls = {};
+
+  if (!userId) {
+    res.redirect('/login');
+  }
+
+  Object.keys(urlDatabase).forEach(function(shortURL) {
+    if (urlDatabase[shortURL].user === userId) {
+      urls[shortURL] = urlDatabase[shortURL].longURL;
+    }
+  });
+  let templateVars = { urls, users, userId: req.cookies['user_id'] };
+
   res.render("urls_index", templateVars);
 });
 
