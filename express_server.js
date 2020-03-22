@@ -23,12 +23,19 @@ function generateRandomString(length) {
 };
 
 const urlDatabase = {
-  b2xVn2: { longURL: "http://www.lighthouselabs.ca", user: "abcd" },
-  b9m5xK: { longURL: "http://www.google.com", user: "abcd" }
+  'b2xVn2': { longURL: "http://www.lighthouselabs.ca", user: "abcd" },
+  'b9m5xK': { longURL: "http://www.google.com", user: "abcd" }
 };
 
-const users = {
-  };
+const users = {};
+
+const getUserByEmail = function(emailInput, database) {
+  for (let userId in database) {
+       if (users[userId].email === emailInput) {
+      return true;
+     } 
+    }
+};
 
 app.get("/u/:shortURL", (req, res) => {
   shortURL = Object.keys(urlDatabase)[0];
@@ -73,11 +80,9 @@ app.post("/register", (req, res) => {
     res.status(400).send('I\'m sorry, one of the fields are empty. Please try again.'); 
   } 
   
-  Object.keys(users).forEach(function(userId) {
-    if (req.body.email === users[userId].email) {
-     res.status(400).send('That email address has already been registered. Please try again.');
-    } 
-  });
+  if (getUserByEmail(req.body.email, users)) {
+    res.status(400).send('That email address has already been registered. Please try again.');
+  }
 
   let userId = generateRandomString(4).toString();
   let password = req.body.password;
@@ -112,26 +117,26 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 app.post("/login", (req, res) => {
   let templateVars = { email: req.body.email, password: req.body.password };
-  
-  Object.keys(users).forEach(function(userId) {
-    if (req.body.email === users[userId].email && bcrypt.compareSync(req.body.password, users[userId].password)) {
-    req.session.user_id = userId; 
-    res.redirect('/urls/');
-    }
-  });
 
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send('I\'m sorry, one or more of the fields are empty. Please try again.'); 
   } 
   
   Object.keys(users).forEach(function(userId) {
-    if (req.body.email === users[userId].email && !bcrypt.compareSync(req.body.password, users[userId].password)) {
+    if (getUserByEmail(req.body.email, users) && bcrypt.compareSync(req.body.password, users[userId].password)) {
+    req.session.user_id = userId; 
+    res.redirect('/urls/');
+    }
+  });
+
+  Object.keys(users).forEach(function(userId) {
+    if (getUserByEmail(req.body.email, users) && !bcrypt.compareSync(req.body.password, users[userId].password)) {
       res.status(403).send('Sorry, the password is incorrect.');
     }
   })
 
   Object.keys(users).forEach(function(userId) {
-    if (req.body.email !== users[userId].email) {
+    if (!getUserByEmail(req.body.email, users)) {
       res.status(403).send('Sorry, there is no account registered with that email address.');
      } 
   });
