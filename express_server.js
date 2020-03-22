@@ -29,11 +29,12 @@ const users = {
     id: 'abcd',
     email: 'brad@email.com',
     password: '123'
-  }
-
+        }
   };
 
 app.get("/u/:shortURL", (req, res) => {
+  shortURL = Object.keys(urlDatabase)[0];
+  longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -47,12 +48,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  let templateVars = { users, userId: req.cookies['user_id'],  };
+  let templateVars = { users, userId: req.cookies['user_id']  };
   res.render("urls_registration", templateVars);
 });
 
 app.get("/login", (req, res) => {
-  let templateVars = { users, userId: req.cookies['user_id'],  };
+  let templateVars = { users, userId: req.cookies['user_id']  };
   res.render("urls_login", templateVars);
 });
 
@@ -89,6 +90,10 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
+  let loginStatus = req.cookies['user_id'];
+  if (!loginStatus) {
+    res.status(403).send('You do not have permission.');
+  };
   const deletedURL = req.params.shortURL;
   delete urlDatabase[deletedURL];
   res.redirect('/urls/');
@@ -97,8 +102,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/update", (req, res) => {
   shortURL = req.params.shortURL;
   newLongURL = req.body.updatedURL;
+  let loginStatus = req.cookies['user_id'];
+  if (!loginStatus) {
+    res.status(403).send('You do not have permission.');
+  };
 
-  let templateVars = { shortURL: req.params.shortURL, urls: urlDatabase };
   urlDatabase[shortURL].longURL = newLongURL;
   res.redirect('/urls/');
 });
