@@ -4,6 +4,8 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const getUserByEmail = require('./helpers');
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -28,14 +30,6 @@ const urlDatabase = {
 };
 
 const users = {};
-
-const getUserByEmail = function(emailInput, database) {
-  for (let userId in database) {
-       if (users[userId].email === emailInput) {
-      return true;
-     } 
-    }
-};
 
 app.get("/u/:shortURL", (req, res) => {
   shortURL = Object.keys(urlDatabase)[0];
@@ -192,3 +186,5 @@ app.get("/hello", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+module.exports.users = users;
