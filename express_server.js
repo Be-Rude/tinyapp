@@ -3,6 +3,7 @@ const app =  express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -82,11 +83,12 @@ app.post("/register", (req, res) => {
   });
 
   let userId = generateRandomString(4).toString();
-  
-  users[userId] = { id: userId, email: req.body.email, password: req.body.password };
+  let password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  users[userId] = { id: userId, email: req.body.email, password: hashedPassword };
   res.cookie('user_id', userId); 
   res.redirect('/urls/');  
-
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -113,9 +115,9 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 app.post("/login", (req, res) => {
   let templateVars = { email: req.body.email, password: req.body.password };
-
+  
   Object.keys(users).forEach(function(userId) {
-    if (req.body.email === users[userId].email) {
+    if (req.body.email === users[userId].email && bcrypt.compareSync(req.body.password, users[userId].password)) {
     res.cookie('user_id', userId); 
     res.redirect('/urls/');
     }
@@ -126,15 +128,16 @@ app.post("/login", (req, res) => {
   } 
   
   Object.keys(users).forEach(function(userId) {
-    if (req.body.email !== users[userId].email) {
-     res.status(403).send('Sorry, there is no account registered with that email address.');
-    } 
-
-    if (req.body.email === users[userId].email && req.body.password !== users[userId].password) {
+    if (req.body.email === users[userId].email && !bcrypt.compareSync(req.body.password, users[userId].password)) {
       res.status(403).send('Sorry, the password is incorrect.');
     }
+  })
+
+  Object.keys(users).forEach(function(userId) {
+    if (req.body.email !== users[userId].email) {
+      res.status(403).send('Sorry, there is no account registered with that email address.');
+     } 
   });
-  
 })
 
 app.post("/logout", (req, res) => {
