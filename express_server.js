@@ -6,7 +6,6 @@ const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const getUserByEmail = require('./helpers');
 
-
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
@@ -15,15 +14,20 @@ app.use(cookieSession({
 
 app.set("view engine", "ejs");
 
+
+// Generates random strings for User Id and Short URLs
 const generateRandomString = function(length) {
   const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   for (let i = 0; i < length; i++) {
-    result += randomChars.charAt(Math.floor(Math.random(6) * randomChars.length));
+    result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
   }
   return result;
 };
 
+
+
+//Databases
 const urlDatabase = {
   'b2xVn2': { longURL: "http://www.lighthouselabs.ca", user: "abcd" },
   'b9m5xK': { longURL: "http://www.google.com", user: "abcd" }
@@ -42,8 +46,9 @@ const users = {
   }
 };
 
+//GET and POST call routing
 app.get("/u/:shortURL", (req, res) => {
-  let shortURL = Object.keys(urlDatabase)[0];
+  let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
@@ -67,8 +72,9 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 
+//New Short URL creation
 app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString(6).toString();
+  let shortURL = generateRandomString(6);
   let longURL = req.body.longURL;
   let userId = req.session.user_id;
   
@@ -79,23 +85,24 @@ app.post("/urls", (req, res) => {
   res.redirect('/urls/');
 });
 
+//New user registration
 app.post("/register", (req, res) => {
   
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send('I\'m sorry, one of the fields are empty. Please try again.');
-  }
+  } else 
   
   if (getUserByEmail(req.body.email, users)) {
     res.status(400).send('That email address has already been registered. Please try again.');
-  }
+  } else
 
-  let userId = generateRandomString(4).toString();
+  userId = generateRandomString(4);
   let password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   users[userId] = { id: userId, email: req.body.email, password: hashedPassword };
   req.session.user_id = userId;
-  res.redirect('/urls/');
+  res.redirect('/urls');
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -105,7 +112,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
   const deletedURL = req.params.shortURL;
   delete urlDatabase[deletedURL];
-  res.redirect('/urls/');
+  res.redirect('/urls');
 });
 
 app.post("/urls/:shortURL/update", (req, res) => {
@@ -120,6 +127,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
   res.redirect('/urls/');
 });
 
+//Existing user login
 app.post("/login", (req, res) => {
 
   if (req.body.email === "" || req.body.password === "") {
@@ -181,7 +189,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect('/urls');
 });
 
 app.get("/urls.json", (req, res) => {
